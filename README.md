@@ -1,24 +1,34 @@
-# README
+# Que 0.12.0 and Rails 5
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+[Que 0.12.0][] does not work with [Rails 5][]. The PostgreSQL exclusive locks
+which it uses when workers pull jobs incorrectly attempts to release those
+locks on a different database connection than the one on which it was created.
 
-Things you may want to cover:
+This can be seen in the PostgreSQL logs as:
 
-* Ruby version
+```plain
+WARNING:  you don't own a lock of type ExclusiveLock
+```
 
-* System dependencies
+Eventually, the PostgreSQL server becomes overrun with open locks and exhausts
+its (configurable) max open lock count and refuses to allow any further locks
+to be created. This functionally stops the workers from working and the
+application from obtaining its own locks for data insertions.
 
-* Configuration
+This repository shows a minimum viable exploit of the issue.
 
-* Database creation
+After setting up your `config/database.yml` to connect to your local PostgreSQL
+instance:
 
-* Database initialization
+```sh
+./bin/rake db:create
+./bin/rake db:migrate
+./bin/rake
+```
 
-* How to run the test suite
+You'll see something like the following:
 
-* Services (job queues, cache servers, search engines, etc.)
+![Que generating ExclusiveLock PostgreSQL WARNINGS](app/assets/images/que.gif)
 
-* Deployment instructions
-
-* ...
+[Que 0.12.0]: https://rubygems.org/gems/que
+[Rails 5]: https://rubygems.org/gems/rails

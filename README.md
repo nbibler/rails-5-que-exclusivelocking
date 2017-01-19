@@ -3,6 +3,7 @@
 [Que 0.12.0][] does not work with [Rails 5][]. The PostgreSQL exclusive locks
 which it uses when workers pull jobs incorrectly attempts to release those
 locks on a different database connection than the one on which it was created.
+There is an issue in Que's repo at [chanks/que#166][].
 
 This can be seen in the PostgreSQL logs as:
 
@@ -32,3 +33,4 @@ You'll see something like the following:
 
 [Que 0.12.0]: https://rubygems.org/gems/que
 [Rails 5]: https://rubygems.org/gems/rails
+[chanks/que#166]: https://github.com/chanks/que/issues/166
